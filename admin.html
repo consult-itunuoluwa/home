@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consult Itunuoluwa — Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--nv:#0B1F4B;--nv2:#142560;--gd:#C8901A;--tl:#0A7B5E;--rd:#C0392B;--bg:#F2F1EC;--bd:#E2E0D8;--tx:#1A1A2E;--mt:#666672;--wh:#fff;--f:'Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:14px}
+#warn{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#7B1F1F;color:#fff;padding:.8rem 1.5rem;font-size:.8rem;align-items:center;gap:1rem;flex-wrap:wrap}
+#warn code{background:rgba(255,255,255,.15);padding:.15rem .5rem;border-radius:3px}
+#warn button{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;padding:.25rem .75rem;border-radius:3px;cursor:pointer}
+#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--nv)}
+.ab{background:var(--wh);border-radius:8px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.ab h1{font-size:1.2rem;color:var(--nv);margin-bottom:.3rem}.ab>p{font-size:.8rem;color:var(--mt);margin-bottom:1.4rem}
+.ae{display:none;background:#fdf2f2;border:1px solid #f5c6c6;color:var(--rd);padding:.65rem 1rem;border-radius:4px;font-size:.8rem;margin-bottom:.9rem}
+.setup{margin-top:1rem;padding:1rem;background:var(--bg);border-radius:4px;font-size:.72rem;color:var(--mt)}
+.setup b{display:block;color:var(--nv);margin-bottom:.5rem;font-size:.78rem}
+#app{display:none}
+.tb{background:var(--nv);color:#fff;padding:.85rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-b{font-size:.92rem;font-weight:600}.tb-b span{color:#E6AC3A}
+.tb-r{display:flex;align-items:center;gap:.7rem}
+.tb-r small{font-size:.7rem;color:rgba(255,255,255,.5)}
+.xb{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);padding:.28rem .75rem;border-radius:4px;font-size:.75rem;cursor:pointer;text-decoration:none}
+.xb:hover{background:rgba(255,255,255,.22)}
+.ly{display:grid;grid-template-columns:196px 1fr;min-height:calc(100vh - 46px)}
+.sb{background:var(--wh);border-right:1px solid var(--bd);padding:.8rem 0;overflow-y:auto}
+.sg{padding:.32rem 1rem .12rem;font-size:.6rem;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.08em;margin-top:.6rem}
+.si{display:flex;align-items:center;gap:.55rem;padding:.52rem 1rem;cursor:pointer;color:var(--mt);font-size:.82rem;border-left:2px solid transparent;transition:all .14s}
+.si:hover{background:var(--bg);color:var(--nv)}.si.on{background:#EEF2FF;color:var(--nv);border-left-color:var(--gd);font-weight:500}
+.si .d{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.mn{padding:1.4rem;overflow-y:auto}
+.pg{display:none}.pg.on{display:block}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem}
+.ph h2{font-size:1.05rem;color:var(--nv)}.ph p{font-size:.74rem;color:var(--mt);margin-top:.15rem}
+.cd{background:var(--wh);border:1px solid var(--bd);border-radius:6px;margin-bottom:1rem}
+.ch{padding:.85rem 1.2rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ch h3{font-size:.86rem;font-weight:600;color:var(--nv)}.cb{padding:1.1rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.3rem}
+.sc{background:var(--wh);border:1px solid var(--bd);border-radius:6px;padding:1.1rem;border-top:3px solid var(--gd)}
+.sc .n{font-size:1.75rem;font-weight:700;color:var(--nv);line-height:1;margin-bottom:.25rem}
+.sc .l{font-size:.68rem;color:var(--mt);text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.68rem;color:var(--mt);font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:.48rem .75rem;border-bottom:1px solid var(--bd);background:var(--bg)}
+td{padding:.6rem .75rem;border-bottom:1px solid var(--bd);vertical-align:top;font-size:.81rem}
+tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
+.fg{margin-bottom:.85rem}
+label{display:block;font-size:.7rem;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.28rem}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;border:1px solid var(--bd);border-radius:4px;padding:.52rem .78rem;font-family:var(--f);font-size:.84rem;color:var(--tx);background:var(--wh);outline:none;transition:border-color .14s}
+input:focus,textarea:focus,select:focus{border-color:var(--gd)}textarea{resize:vertical;min-height:78px;line-height:1.6}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.46rem .95rem;border-radius:4px;font-size:.81rem;font-weight:500;cursor:pointer;border:none;transition:all .14s;font-family:var(--f)}
+.bp{background:var(--nv);color:#fff}.bp:hover{background:var(--nv2)}
+.bg_{background:var(--gd);color:#fff}.bg_:hover{background:#b07818}
+.bsm{padding:.28rem .6rem;font-size:.74rem}
+.bd_{background:#fdf2f2;color:var(--rd);border:1px solid #f5c6c6}.bd_:hover{background:#f8d7d7}
+.bh{background:transparent;color:var(--mt);border:1px solid var(--bd)}.bh:hover{background:var(--bg);color:var(--nv)}
+.bk{display:inline-block;padding:.11rem .48rem;border-radius:2px;font-size:.67rem;font-weight:500}
+.kt{background:#e0f5ee;color:var(--tl)}.kg{background:#fff4dc;color:var(--gd)}.kn{background:#eef2ff;color:var(--nv)}.kr{background:#fdf2f2;color:var(--rd)}
+.tog{display:flex;align-items:center;gap:.45rem;font-size:.77rem;color:var(--mt);cursor:pointer}
+.tog input{width:32px;height:17px;appearance:none;background:var(--bd);border-radius:8px;cursor:pointer;position:relative;transition:background .18s;flex-shrink:0}
+.tog input:checked{background:var(--tl)}.tog input::before{content:'';position:absolute;width:11px;height:11px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .18s}
+.tog input:checked::before{transform:translateX(15px)}
+.ov{display:none;position:fixed;inset:0;background:rgba(11,31,75,.52);z-index:200;align-items:center;justify-content:center}
+.ov.on{display:flex}
+.md{background:var(--wh);border-radius:8px;width:90%;max-width:540px;max-height:86vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.25)}
+.mh{padding:1rem 1.3rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--wh);z-index:1}
+.mh h3{font-size:.96rem;color:var(--nv)}.mc{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--mt)}
+.mb{padding:1.3rem}.mf{padding:.9rem 1.3rem;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:.6rem}
+.ii{padding:.85rem 1rem;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .13s}
+.ii:hover{background:var(--bg)}.ii.u{border-left:3px solid var(--gd)}.ii.r{border-left:3px solid transparent}
+.im{display:flex;gap:.7rem;align-items:center;margin-bottom:.22rem}
+.in{font-weight:500;font-size:.84rem}.it{font-size:.69rem;color:var(--mt);margin-left:auto}
+.ip{font-size:.76rem;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ld{text-align:center;padding:1.8rem;color:var(--mt);font-size:.83rem}
+.sp{display:inline-block;width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--nv);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:.4rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.em{text-align:center;padding:2.2rem 1rem;color:var(--mt);font-size:.83rem}
+#toast{position:fixed;bottom:1.4rem;right:1.4rem;z-index:999;background:var(--nv);color:#fff;padding:.65rem 1.05rem;border-radius:5px;font-size:.81rem;transform:translateY(80px);opacity:0;transition:all .28s;pointer-events:none}
+#toast.on{transform:translateY(0);opacity:1}#toast.ok{border-left:3px solid var(--tl)}#toast.er{border-left:3px solid var(--rd)}
+@media(max-width:760px){.ly{grid-template-columns:1fr}.sb{display:none}.g4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="warn">
+  <span>⚠️ <strong>Opened as file://</strong> — Supabase login is blocked by your browser in this mode.</span>
+  <span>Fix: open Terminal / Command Prompt in this folder and run: <code>python -m http.server 8080</code> then open <code>http://localhost:8080/admin.html</code></span>
+  <button onclick="this.parentElement.style.display='none'">✕</button>
+</div>
+
+<div id="auth">
+  <div class="ab">
+    <h1>Admin Login</h1>
+    <p>Consult Itunuoluwa — Website Dashboard</p>
+    <div class="ae" id="ae"></div>
+    <div class="fg"><label>Email</label>
+      <input type="email" id="em" value="itunuoluwa@giddy2school.org"></div>
+    <div class="fg"><label>Password</label>
+      <input type="password" id="pw" placeholder="Your Supabase password"></div>
+    <button class="btn bp" id="lb" style="width:100%;justify-content:center;margin-bottom:.5rem">Sign In to Dashboard</button>
+    <div class="setup">
+      <b>First time? Paste your Supabase keys here (saved after first use):</b>
+      <div class="fg" style="margin-bottom:.5rem"><label>Project URL</label>
+        <input type="text" id="su" placeholder="https://xxxx.supabase.co"></div>
+      <div class="fg" style="margin-bottom:.3rem"><label>Anon Key</label>
+        <input type="text" id="sk" placeholder="eyJhbGci..."></div>
+      <small>Supabase → Settings → API</small>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="tb">
+    <div class="tb-b">Consult <span>Itunuoluwa</span> — Admin</div>
+    <div class="tb-r">
+      <small id="ue"></small>
+      <a href="consult-itunuoluwa.html" target="_blank" class="xb">View Site ↗</a>
+      <button class="xb" id="lo">Sign Out</button>
+    </div>
+  </div>
+  <div class="ly">
+    <div class="sb">
+      <div class="sg">Overview</div>
+      <div class="si on" data-p="dash"><span class="d"></span>Dashboard</div>
+      <div class="si" data-p="inbox"><span class="d"></span>Inbox <span id="ub" style="display:none;margin-left:auto;background:var(--gd);color:#fff;font-size:.6rem;padding:.08rem .38rem;border-radius:7px"></span></div>
+      <div class="sg">Content</div>
+      <div class="si" data-p="cnt"><span class="d"></span>Hero &amp; About</div>
+      <div class="si" data-p="svc"><span class="d"></span>Services</div>
+      <div class="si" data-p="tm"><span class="d"></span>Testimonials</div>
+      <div class="si" data-p="sp"><span class="d"></span>Speaking</div>
+      <div class="si" data-p="pr"><span class="d"></span>Proof &amp; Stats</div>
+      <div class="si" data-p="aw"><span class="d"></span>Awards</div>
+    </div>
+    <div class="mn">
+
+      <div class="pg on" id="pg-dash">
+        <div class="ph"><div><h2>Dashboard</h2><p>Live overview</p></div>
+          <a href="consult-itunuoluwa.html" target="_blank" class="btn bh bsm">Preview ↗</a></div>
+        <div class="g4">
+          <div class="sc"><div class="n" id="ns">—</div><div class="l">Active Services</div></div>
+          <div class="sc"><div class="n" id="nt">—</div><div class="l">Testimonials</div></div>
+          <div class="sc"><div class="n" id="na">—</div><div class="l">Awards</div></div>
+          <div class="sc"><div class="n" id="ni">—</div><div class="l">Unread Messages</div></div>
+        </div>
+        <div class="cd"><div class="ch"><h3>Recent Messages</h3><button class="btn bh bsm" id="va">View All</button></div>
+          <div id="rc"><div class="ld"><span class="sp"></span>Loading…</div></div></div>
+        <div class="cd" style="margin-top:1rem"><div class="ch"><h3>Quick Links</h3></div>
+          <div class="cb" style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <a href="https://calendly.com/itunuoluwa-giddy2school/consult-itunuoluwa-one-on-one-discovery-call" target="_blank" class="btn bh bsm">Calendly 20-min ↗</a>
+            <a href="https://calendly.com/itunuoluwa-giddy2school/30min" target="_blank" class="btn bh bsm">Calendly 30-min ↗</a>
+            <a href="https://paystack.shop/consult-itunuoluwa" target="_blank" class="btn bh bsm">Paystack Shop ↗</a>
+            <a href="https://wa.me/2348053388755" target="_blank" class="btn bh bsm">WhatsApp ↗</a>
+            <a href="https://www.linkedin.com/in/itunuoluwa-bamidele-751b15178" target="_blank" class="btn bh bsm">LinkedIn ↗</a>
+            <a href="https://www.instagram.com/blissz21/" target="_blank" class="btn bh bsm">Instagram ↗</a>
+          </div></div>
+      </div>
+
+      <div class="pg" id="pg-inbox">
+        <div class="ph"><div><h2>Inbox</h2><p>Contact form submissions</p></div></div>
+        <div class="cd"><div id="il"><div class="ld"><span class="sp"></span>Loading…</div></div></div>
+      </div>
+
+      <div class="pg" id="pg-cnt">
+        <div class="ph"><div><h2>Hero &amp; About</h2><p>Edit main copy and section text</p></div></div>
+        <div id="cl"></div>
+      </div>
+
+      <div class="pg" id="pg-svc">
+        <div class="ph"><div><h2>Services</h2><p>All 8 packages</p></div>
+          <button class="btn bg_ bsm" id="sva">+ Add Service</button></div>
+        <div class="cd"><table><thead><tr><th>#</th><th>Title</th><th>Tier</th><th>Price</th><th>Active</th><th></th></tr></thead>
+          <tbody id="svt"><tr><td colspan="6"><div class="ld"><span class="sp"></span>Loading…</div></td></tr></tbody></table></div>
+      </div>
+
+      <div class="pg" id="pg-tm">
+        <div class="ph"><div><h2>Testimonials</h2><p>3 client quotes</p></div>
+          <button class="btn bg_ bsm" id="tma">+ Add</button></div>
+        <div class="cd"><table><thead><tr><th>Name</th><th>Role</th><th>Quote</th><th>Active</th><th></th></tr></thead>
+          <tbody id="tmt"><tr><td colspan="5"><div class="ld"><span class="sp"></span>Loading…</div></td></tr></tbody></table></div>
+      </div>
+
+      <div class="pg" id="pg-sp">
+        <div class="ph"><div><h2>Speaking Topics</h2><p>5 keynotes &amp; workshops</p></div>
+          <button class="btn bg_ bsm" id="spa">+ Add</button></div>
+        <div class="cd"><table><thead><tr><th>#</th><th>Title</th><th>Format</th><th>Active</th><th></th></tr></thead>
+          <tbody id="spt"><tr><td colspan="5"><div class="ld"><span class="sp"></span>Loading…</div></td></tr></tbody></table></div>
+      </div>
+
+      <div class="pg" id="pg-pr">
+        <div class="ph"><div><h2>Proof &amp; Stats</h2><p>6 impact numbers</p></div>
+          <button class="btn bg_ bsm" id="pra">+ Add</button></div>
+        <div class="cd"><table><thead><tr><th>#</th><th>Number</th><th>Label</th><th>Tag</th><th>Active</th><th></th></tr></thead>
+          <tbody id="prt"><tr><td colspan="6"><div class="ld"><span class="sp"></span>Loading…</div></td></tr></tbody></table></div>
+      </div>
+
+      <div class="pg" id="pg-aw">
+        <div class="ph"><div><h2>Awards &amp; Fellowships</h2><p>15 recognitions</p></div>
+          <button class="btn bg_ bsm" id="awa">+ Add</button></div>
+        <div class="cd"><table><thead><tr><th>Year</th><th>Title</th><th>Detail</th><th>Active</th><th></th></tr></thead>
+          <tbody id="awt"><tr><td colspan="5"><div class="ld"><span class="sp"></span>Loading…</div></td></tr></tbody></table></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MAIN MODAL -->
+<div class="ov" id="mo">
+  <div class="md">
+    <div class="mh"><h3 id="mt">Edit</h3><button class="mc" id="mc">✕</button></div>
+    <div class="mb" id="mb"></div>
+    <div class="mf"><button class="btn bh" id="mca">Cancel</button><button class="btn bp" id="ms">Save</button></div>
+  </div>
+</div>
+
+<!-- MESSAGE MODAL -->
+<div class="ov" id="mo2">
+  <div class="md">
+    <div class="mh"><h3>Message Detail</h3><button class="mc" id="mc2">✕</button></div>
+    <div class="mb" id="mb2"></div>
+    <div class="mf"><button class="btn bh" id="mc2b">Close</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── ZERO CONFLICTS: client stored in C, never named 'supabase' ──
+var C = null;          // Supabase client
+var SU = localStorage.getItem('_su') || '';
+var SK = localStorage.getItem('_sk') || '';
+var saveFn = null;
+var EID = null;        // current edit id
+
+function mkClient() {
+  if (!SU || !SK) return false;
+  try { C = window.supabase.createClient(SU, SK); return true; }
+  catch(e) { return false; }
+}
+
+// Show file:// warning
+if (location.protocol === 'file:') document.getElementById('warn').style.display = 'flex';
+
+// ── BOOT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Restore saved keys
+  if (SU) document.getElementById('su').value = SU;
+  if (SK) document.getElementById('sk').value = SK;
+  // Pre-load project credentials (anon key — safe to embed)
+  if (!SU) { SU = 'https://jqznsvhopfutfrdkmuud.supabase.co'; localStorage.setItem('_su', SU); document.getElementById('su').value = SU; }
+  if (!SK) { SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE'; localStorage.setItem('_sk', SK); document.getElementById('sk').value = SK; }
+  mkClient();
+
+  // Auth buttons
+  document.getElementById('lb').onclick  = doLogin;
+  document.getElementById('pw').onkeydown = function(e){ if(e.key==='Enter') doLogin(); };
+  document.getElementById('lo').onclick  = doLogout;
+
+  // Modal buttons
+  document.getElementById('mc').onclick  = closeM;
+  document.getElementById('mca').onclick = closeM;
+  document.getElementById('ms').onclick  = function(){ if(saveFn) saveFn(); };
+  document.getElementById('mc2').onclick  = function(){ document.getElementById('mo2').classList.remove('on'); };
+  document.getElementById('mc2b').onclick = function(){ document.getElementById('mo2').classList.remove('on'); };
+
+  // Sidebar
+  document.querySelectorAll('.si').forEach(function(el){
+    el.onclick = function(){ go(this.dataset.p); };
+  });
+
+  // Dashboard sub-buttons
+  document.getElementById('va').onclick = function(){ go('inbox'); };
+
+  // Add buttons
+  document.getElementById('sva').onclick = function(){ openSvc(); };
+  document.getElementById('tma').onclick = function(){ openTm(); };
+  document.getElementById('spa').onclick = function(){ openSp(); };
+  document.getElementById('pra').onclick = function(){ openPr(); };
+  document.getElementById('awa').onclick = function(){ openAw(); };
+});
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function doLogin() {
+  var email = document.getElementById('em').value.trim();
+  var pass  = document.getElementById('pw').value;
+  var u = document.getElementById('su').value.trim();
+  var k = document.getElementById('sk').value.trim();
+  var err = document.getElementById('ae');
+
+  if (u) { localStorage.setItem('_su', u); SU = u; }
+  if (k) { localStorage.setItem('_sk', k); SK = k; }
+
+  if (!SU || !SK) { showErr('Paste your Supabase Project URL and Anon Key first.'); return; }
+  if (!mkClient())  { showErr('Cannot connect — check the Project URL.'); return; }
+
+  var lb = document.getElementById('lb');
+  lb.textContent = 'Signing in…'; lb.disabled = true;
+  var r = await C.auth.signInWithPassword({ email: email, password: pass });
+  lb.textContent = 'Sign In to Dashboard'; lb.disabled = false;
+
+  if (r.error) { showErr(r.error.message); return; }
+  err.style.display = 'none';
+  document.getElementById('ue').textContent = email;
+  document.getElementById('auth').style.display = 'none';
+  document.getElementById('app').style.display  = 'block';
+  loadDash();
+}
+
+function showErr(msg) {
+  var e = document.getElementById('ae');
+  e.textContent = msg; e.style.display = 'block';
+}
+
+async function doLogout() {
+  await C.auth.signOut();
+  document.getElementById('auth').style.display = 'flex';
+  document.getElementById('app').style.display  = 'none';
+}
+
+// ── NAV ───────────────────────────────────────────────────────
+var loaders = { dash:loadDash, inbox:loadInbox, cnt:loadCnt, svc:loadSvc, tm:loadTm, sp:loadSp, pr:loadPr, aw:loadAw };
+function go(p) {
+  document.querySelectorAll('.pg').forEach(function(x){ x.classList.remove('on'); });
+  document.querySelectorAll('.si').forEach(function(x){ x.classList.remove('on'); });
+  document.getElementById('pg-'+p).classList.add('on');
+  document.querySelectorAll('.si').forEach(function(x){ if(x.dataset.p===p) x.classList.add('on'); });
+  if (loaders[p]) loaders[p]();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, t) {
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'on '+(t||'ok');
+  setTimeout(function(){ el.className=''; }, 2700);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openM(title, html, fn) {
+  document.getElementById('mt').textContent = title;
+  document.getElementById('mb').innerHTML = html;
+  document.getElementById('mo').classList.add('on');
+  saveFn = fn;
+}
+function closeM() { document.getElementById('mo').classList.remove('on'); saveFn=null; EID=null; }
+
+// ── UTILS ─────────────────────────────────────────────────────
+function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function g(id){ var e=document.getElementById(id); return e?e.value:''; }
+function tog(tbl,id,chk){
+  return '<label class="tog"><input type="checkbox"'+(chk?' checked':'')+
+    ' onchange="tgRow(\''+tbl+'\','+id+',this.checked)"> '+(chk?'Active':'Hidden')+'</label>';
+}
+async function tgRow(tbl,id,val){
+  var r = await C.from(tbl).update({is_active:val}).eq('id',id);
+  toast(val?'Visible on site':'Hidden from site', r.error?'er':'ok');
+}
+async function delRow(tbl,id,fn){
+  if(!confirm('Delete this item? Cannot be undone.')) return;
+  var r = await C.from(tbl).delete().eq('id',id);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Deleted'); fn();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDash() {
+  var all = await Promise.all([
+    C.from('services').select('id',{count:'exact',head:true}).eq('is_active',true),
+    C.from('testimonials').select('id',{count:'exact',head:true}).eq('is_active',true),
+    C.from('awards').select('id',{count:'exact',head:true}).eq('is_active',true),
+    C.from('contact_submissions').select('id',{count:'exact',head:true}).eq('is_read',false),
+  ]);
+  document.getElementById('ns').textContent = all[0].count||0;
+  document.getElementById('nt').textContent = all[1].count||0;
+  document.getElementById('na').textContent = all[2].count||0;
+  document.getElementById('ni').textContent = all[3].count||0;
+  if(all[3].count>0){var b=document.getElementById('ub');b.textContent=all[3].count;b.style.display='inline';}
+  var rc = await C.from('contact_submissions').select('*').order('submitted_at',{ascending:false}).limit(5);
+  var el = document.getElementById('rc');
+  if(!rc.data||!rc.data.length){el.innerHTML='<div class="em">No submissions yet.</div>';return;}
+  el.innerHTML = rc.data.map(function(s){
+    return '<div class="ii '+(s.is_read?'r':'u')+'" onclick="viewMsg('+s.id+')">'+
+      '<div class="im"><span class="in">'+h(s.full_name)+'</span>'+
+      '<span class="bk '+(s.is_read?'kn':'kg')+'">'+(s.is_read?'Read':'New')+'</span>'+
+      '<span class="it">'+new Date(s.submitted_at).toLocaleDateString()+'</span></div>'+
+      '<div class="ip">'+h(s.service_need||'')+(s.message?' — '+h(s.message.substring(0,55)):'')+'</div></div>';
+  }).join('');
+}
+
+// ── INBOX ─────────────────────────────────────────────────────
+async function loadInbox() {
+  var r = await C.from('contact_submissions').select('*').order('submitted_at',{ascending:false});
+  var el = document.getElementById('il');
+  if(!r.data||!r.data.length){el.innerHTML='<div class="em">No submissions yet.</div>';return;}
+  el.innerHTML = r.data.map(function(s){
+    return '<div class="ii '+(s.is_read?'r':'u')+'" onclick="viewMsg('+s.id+')">'+
+      '<div class="im"><span class="in">'+h(s.full_name)+'</span>'+
+      '<span class="bk '+(s.is_read?'kn':'kg')+'">'+(s.is_read?'Read':'New')+'</span>'+
+      '<span class="it">'+new Date(s.submitted_at).toLocaleString()+'</span></div>'+
+      '<div class="ip">'+h(s.email)+' · '+h(s.service_need||'No service specified')+'</div></div>';
+  }).join('');
+}
+
+async function viewMsg(id) {
+  var r = await C.from('contact_submissions').select('*').eq('id',id).single();
+  if(!r.data) return;
+  await C.from('contact_submissions').update({is_read:true}).eq('id',id);
+  var d = r.data;
+  document.getElementById('mb2').innerHTML =
+    '<div style="display:grid;gap:.75rem">'+
+    '<div class="r2"><div><label>Name</label><p>'+h(d.full_name)+'</p></div>'+
+    '<div><label>Email</label><p><a href="mailto:'+h(d.email)+'">'+h(d.email)+'</a></p></div></div>'+
+    '<div class="r2"><div><label>WhatsApp</label><p>'+h(d.whatsapp||'—')+'</p></div>'+
+    '<div><label>Client Type</label><p>'+h(d.client_type||'—')+'</p></div></div>'+
+    '<div><label>Service Needed</label><p>'+h(d.service_need||'—')+'</p></div>'+
+    '<div><label>Message</label><p style="line-height:1.65">'+h(d.message||'—')+'</p></div>'+
+    '<div><label>Submitted</label><p>'+new Date(d.submitted_at).toLocaleString()+'</p></div>'+
+    '<div style="display:flex;gap:.6rem;margin-top:.2rem">'+
+    '<a href="mailto:'+h(d.email)+'" class="btn bp bsm">Reply by Email</a>'+
+    (d.whatsapp?'<a href="https://wa.me/'+d.whatsapp.replace(/\D/g,'')+'" target="_blank" class="btn bsm" style="background:#e8f7f3;color:var(--tl);border:1px solid #b3e0d4">WhatsApp</a>':'')+
+    '</div></div>';
+  document.getElementById('mo2').classList.add('on');
+  loadInbox(); loadDash();
+}
+
+// ── SITE CONTENT ──────────────────────────────────────────────
+async function loadCnt() {
+  var r = await C.from('site_content').select('*').order('id');
+  var el = document.getElementById('cl');
+  if(!r.data){el.innerHTML='<div class="em">Cannot load.</div>';return;}
+  el.innerHTML = r.data.map(function(x){
+    return '<div class="cd" style="margin-bottom:1rem">'+
+      '<div class="ch"><h3>'+h(x.section.replace(/_/g,' ').toUpperCase())+'</h3></div>'+
+      '<div class="cb">'+
+      (x.title?'<div class="fg"><label>Title</label><input type="text" id="c'+x.id+'t" value="'+h(x.title)+'"></div>':'')+
+      (x.subtitle?'<div class="fg"><label>Subtitle / Eyebrow</label><input type="text" id="c'+x.id+'s" value="'+h(x.subtitle)+'"></div>':'')+
+      (x.body?'<div class="fg"><label>Body</label><textarea id="c'+x.id+'b">'+h(x.body)+'</textarea></div>':'')+
+      (x.cta_text?'<div class="fg"><label>CTA Text</label><input type="text" id="c'+x.id+'ct" value="'+h(x.cta_text)+'"></div>':'')+
+      (x.cta_url?'<div class="fg"><label>CTA URL</label><input type="text" id="c'+x.id+'cu" value="'+h(x.cta_url)+'"></div>':'')+
+      '<button class="btn bp bsm" onclick="saveCnt('+x.id+')">Save Changes</button>'+
+      '</div></div>';
+  }).join('');
+}
+async function saveCnt(id) {
+  var u = {updated_at:new Date().toISOString()};
+  var map = {t:'title',s:'subtitle',b:'body',ct:'cta_text',cu:'cta_url'};
+  Object.keys(map).forEach(function(k){
+    var el = document.getElementById('c'+id+k);
+    if(el) u[map[k]] = el.value;
+  });
+  var r = await C.from('site_content').update(u).eq('id',id);
+  toast(r.error?'Error: '+r.error.message:'Saved', r.error?'er':'ok');
+}
+
+// ── SERVICES ──────────────────────────────────────────────────
+async function loadSvc() {
+  var r = await C.from('services').select('*').order('sort_order');
+  var el = document.getElementById('svt');
+  if(!r.data||!r.data.length){el.innerHTML='<tr><td colspan="6"><div class="em">No services.</div></td></tr>';return;}
+  el.innerHTML = r.data.map(function(s){
+    return '<tr><td>'+s.sort_order+'</td><td><strong>'+h(s.title)+'</strong></td>'+
+      '<td><span class="bk kt">'+h(s.tier)+'</span></td><td>'+h(s.price)+'</td>'+
+      '<td>'+tog('services',s.id,s.is_active)+'</td>'+
+      '<td><button class="btn bh bsm" onclick="editSvc('+s.id+')">Edit</button> '+
+      '<button class="btn bd_ bsm" onclick="delRow(\'services\','+s.id+',loadSvc)">Del</button></td></tr>';
+  }).join('');
+}
+function svcF(d){
+  d=d||{};var inc=d.includes?d.includes.join('\n'):'';
+  return '<div class="r2"><div class="fg"><label>Tag</label><input type="text" id="ft" value="'+h(d.tag||'')+'"></div>'+
+    '<div class="fg"><label>Tier</label><select id="fr">'+['individual','institutional','retainer','workshop'].map(function(t){return'<option'+(d.tier===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div></div>'+
+    '<div class="r2"><div class="fg"><label>Sort #</label><input type="text" id="fo" value="'+h(d.sort_order||'')+'"></div>'+
+    '<div class="fg"><label>CTA</label><select id="fc"><option'+(d.cta_type==='book'?' selected':'')+' value="book">Book</option><option'+(d.cta_type==='enquire'?' selected':'')+' value="enquire">Enquire</option></select></div></div>'+
+    '<div class="fg"><label>Title</label><input type="text" id="fti" value="'+h(d.title||'')+'"></div>'+
+    '<div class="fg"><label>Pain Hook</label><input type="text" id="fph" value="'+h(d.pain_hook||'')+'"></div>'+
+    '<div class="fg"><label>Description</label><textarea id="fd">'+h(d.description||'')+'</textarea></div>'+
+    '<div class="fg"><label>Includes (one per line)</label><textarea id="fi">'+h(inc)+'</textarea></div>'+
+    '<div class="r2"><div class="fg"><label>Price</label><input type="text" id="fp" value="'+h(d.price||'')+'"></div>'+
+    '<div class="fg"><label>Suffix</label><input type="text" id="fs" value="'+h(d.price_suffix||'')+'"></div></div>'+
+    '<div class="fg"><label>Calendly URL</label><input type="text" id="fu" value="'+h(d.cal_link||'')+'"></div>';
+}
+function openSvc(d){EID=d?d.id:null;openM(d?'Edit Service':'Add Service',svcF(d),saveSvc);}
+async function editSvc(id){var r=await C.from('services').select('*').eq('id',id).single();if(r.data)openSvc(r.data);}
+async function saveSvc(){
+  var inc=g('fi').trim().split('\n').filter(Boolean);
+  var row={tag:g('ft'),tier:g('fr'),sort_order:parseInt(g('fo'))||0,title:g('fti'),pain_hook:g('fph'),
+    description:g('fd'),includes:inc,price:g('fp'),price_suffix:g('fs'),cta_type:g('fc'),cal_link:g('fu'),updated_at:new Date().toISOString()};
+  var r=EID?await C.from('services').update(row).eq('id',EID):await C.from('services').insert([row]);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Service saved');closeM();loadSvc();
+}
+
+// ── TESTIMONIALS ──────────────────────────────────────────────
+async function loadTm(){
+  var r=await C.from('testimonials').select('*').order('sort_order');
+  var el=document.getElementById('tmt');
+  if(!r.data||!r.data.length){el.innerHTML='<tr><td colspan="5"><div class="em">No testimonials.</div></td></tr>';return;}
+  el.innerHTML=r.data.map(function(t){
+    return '<tr><td><strong>'+h(t.author_name)+'</strong></td>'+
+      '<td>'+h(t.author_role||'—')+'<br><small style="color:var(--mt)">'+h(t.author_org||'')+'</small></td>'+
+      '<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+h(t.quote.substring(0,65))+'…</td>'+
+      '<td>'+tog('testimonials',t.id,t.is_active)+'</td>'+
+      '<td><button class="btn bh bsm" onclick="editTm('+t.id+')">Edit</button> '+
+      '<button class="btn bd_ bsm" onclick="delRow(\'testimonials\','+t.id+',loadTm)">Del</button></td></tr>';
+  }).join('');
+}
+function tmF(d){
+  d=d||{};
+  return '<div class="r2"><div class="fg"><label>Name</label><input type="text" id="fn" value="'+h(d.author_name||'')+'"></div>'+
+    '<div class="fg"><label>Initials</label><input type="text" id="fi2" value="'+h(d.initials||'')+'"></div></div>'+
+    '<div class="r2"><div class="fg"><label>Role</label><input type="text" id="fro" value="'+h(d.author_role||'')+'"></div>'+
+    '<div class="fg"><label>Organisation</label><input type="text" id="forg" value="'+h(d.author_org||'')+'"></div></div>'+
+    '<div class="fg"><label>Quote</label><textarea id="fq" style="min-height:110px">'+h(d.quote||'')+'</textarea></div>'+
+    '<div class="r2"><div class="fg"><label>Sort #</label><input type="text" id="fo" value="'+h(d.sort_order||'')+'"></div>'+
+    '<div class="fg"><label>Avatar colour</label><select id="fcl"><option'+(d.avatar_color==='teal'?' selected':'')+'>teal</option><option'+(d.avatar_color==='gold'?' selected':'')+'>gold</option><option'+(d.avatar_color==='navy'?' selected':'')+'>navy</option></select></div></div>';
+}
+function openTm(d){EID=d?d.id:null;openM(d?'Edit Testimonial':'Add Testimonial',tmF(d),saveTm);}
+async function editTm(id){var r=await C.from('testimonials').select('*').eq('id',id).single();if(r.data)openTm(r.data);}
+async function saveTm(){
+  var row={author_name:g('fn'),initials:g('fi2'),author_role:g('fro'),author_org:g('forg'),
+    quote:g('fq'),sort_order:parseInt(g('fo'))||0,avatar_color:g('fcl'),updated_at:new Date().toISOString()};
+  var r=EID?await C.from('testimonials').update(row).eq('id',EID):await C.from('testimonials').insert([row]);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Testimonial saved');closeM();loadTm();
+}
+
+// ── SPEAKING ──────────────────────────────────────────────────
+async function loadSp(){
+  var r=await C.from('speaking_topics').select('*').order('sort_order');
+  var el=document.getElementById('spt');
+  if(!r.data||!r.data.length){el.innerHTML='<tr><td colspan="5"><div class="em">No topics.</div></td></tr>';return;}
+  el.innerHTML=r.data.map(function(t){
+    return '<tr><td>'+t.sort_order+'</td><td><strong>'+h(t.title)+'</strong></td>'+
+      '<td><span class="bk kn">'+h(t.format||'')+'</span></td>'+
+      '<td>'+tog('speaking_topics',t.id,t.is_active)+'</td>'+
+      '<td><button class="btn bh bsm" onclick="editSp('+t.id+')">Edit</button> '+
+      '<button class="btn bd_ bsm" onclick="delRow(\'speaking_topics\','+t.id+',loadSp)">Del</button></td></tr>';
+  }).join('');
+}
+function spF(d){
+  d=d||{};
+  return '<div class="r2"><div class="fg"><label>Sort #</label><input type="text" id="fo" value="'+h(d.sort_order||'')+'"></div>'+
+    '<div class="fg"><label>Format</label><input type="text" id="ffmt" value="'+h(d.format||'')+'" placeholder="Keynote, Panel, Workshop…"></div></div>'+
+    '<div class="fg"><label>Title</label><input type="text" id="fti" value="'+h(d.title||'')+'"></div>'+
+    '<div class="fg"><label>Description</label><textarea id="fd">'+h(d.description||'')+'</textarea></div>';
+}
+function openSp(d){EID=d?d.id:null;openM(d?'Edit Topic':'Add Topic',spF(d),saveSp);}
+async function editSp(id){var r=await C.from('speaking_topics').select('*').eq('id',id).single();if(r.data)openSp(r.data);}
+async function saveSp(){
+  var row={sort_order:parseInt(g('fo'))||0,format:g('ffmt'),title:g('fti'),description:g('fd'),updated_at:new Date().toISOString()};
+  var r=EID?await C.from('speaking_topics').update(row).eq('id',EID):await C.from('speaking_topics').insert([row]);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Topic saved');closeM();loadSp();
+}
+
+// ── PROOF STATS ───────────────────────────────────────────────
+async function loadPr(){
+  var r=await C.from('proof_stats').select('*').order('sort_order');
+  var el=document.getElementById('prt');
+  if(!r.data||!r.data.length){el.innerHTML='<tr><td colspan="6"><div class="em">No stats.</div></td></tr>';return;}
+  el.innerHTML=r.data.map(function(s){
+    return '<tr><td>'+s.sort_order+'</td>'+
+      '<td><strong style="color:var(--gd);font-size:1rem">'+h(s.stat_number)+'</strong></td>'+
+      '<td>'+h(s.label)+'</td><td><span class="bk kt">'+h(s.tag||'')+'</span></td>'+
+      '<td>'+tog('proof_stats',s.id,s.is_active)+'</td>'+
+      '<td><button class="btn bh bsm" onclick="editPr('+s.id+')">Edit</button> '+
+      '<button class="btn bd_ bsm" onclick="delRow(\'proof_stats\','+s.id+',loadPr)">Del</button></td></tr>';
+  }).join('');
+}
+function prF(d){
+  d=d||{};
+  return '<div class="r2"><div class="fg"><label>Sort #</label><input type="text" id="fo" value="'+h(d.sort_order||'')+'"></div>'+
+    '<div class="fg"><label>Number</label><input type="text" id="fnum" value="'+h(d.stat_number||'')+'" placeholder="20K+, 95%…"></div></div>'+
+    '<div class="fg"><label>Label</label><input type="text" id="flb" value="'+h(d.label||'')+'"></div>'+
+    '<div class="fg"><label>Tag</label><input type="text" id="ftg" value="'+h(d.tag||'')+'"></div>'+
+    '<div class="fg"><label>Description</label><textarea id="fd">'+h(d.description||'')+'</textarea></div>';
+}
+function openPr(d){EID=d?d.id:null;openM(d?'Edit Stat':'Add Stat',prF(d),savePr);}
+async function editPr(id){var r=await C.from('proof_stats').select('*').eq('id',id).single();if(r.data)openPr(r.data);}
+async function savePr(){
+  var row={sort_order:parseInt(g('fo'))||0,stat_number:g('fnum'),label:g('flb'),tag:g('ftg'),description:g('fd'),updated_at:new Date().toISOString()};
+  var r=EID?await C.from('proof_stats').update(row).eq('id',EID):await C.from('proof_stats').insert([row]);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Stat saved');closeM();loadPr();
+}
+
+// ── AWARDS ────────────────────────────────────────────────────
+async function loadAw(){
+  var r=await C.from('awards').select('*').order('sort_order');
+  var el=document.getElementById('awt');
+  if(!r.data||!r.data.length){el.innerHTML='<tr><td colspan="5"><div class="em">No awards.</div></td></tr>';return;}
+  el.innerHTML=r.data.map(function(a){
+    return '<tr><td><span class="bk kg">'+h(a.award_year)+'</span></td>'+
+      '<td><strong>'+h(a.title)+'</strong></td>'+
+      '<td style="color:var(--mt);font-size:.77rem">'+h(a.body||'—')+'</td>'+
+      '<td>'+tog('awards',a.id,a.is_active)+'</td>'+
+      '<td><button class="btn bh bsm" onclick="editAw('+a.id+')">Edit</button> '+
+      '<button class="btn bd_ bsm" onclick="delRow(\'awards\','+a.id+',loadAw)">Del</button></td></tr>';
+  }).join('');
+}
+function awF(d){
+  d=d||{};
+  return '<div class="r2"><div class="fg"><label>Sort #</label><input type="text" id="fo" value="'+h(d.sort_order||'')+'"></div>'+
+    '<div class="fg"><label>Year</label><input type="text" id="fy" value="'+h(d.award_year||'')+'" placeholder="2025"></div></div>'+
+    '<div class="fg"><label>Title</label><input type="text" id="fti" value="'+h(d.title||'')+'"></div>'+
+    '<div class="fg"><label>Detail</label><textarea id="fb">'+h(d.body||'')+'</textarea></div>';
+}
+function openAw(d){EID=d?d.id:null;openM(d?'Edit Award':'Add Award',awF(d),saveAw);}
+async function editAw(id){var r=await C.from('awards').select('*').eq('id',id).single();if(r.data)openAw(r.data);}
+async function saveAw(){
+  var row={sort_order:parseInt(g('fo'))||0,award_year:g('fy'),title:g('fti'),body:g('fb'),updated_at:new Date().toISOString()};
+  var r=EID?await C.from('awards').update(row).eq('id',EID):await C.from('awards').insert([row]);
+  if(r.error){toast('Error: '+r.error.message,'er');return;}
+  toast('Award saved');closeM();loadAw();
+}
+</script>
+</body>
+</html>

@@ -798,7 +798,7 @@
 <section id="hero">
   <div class="hero-grid-bg"></div>
   <div class="hero-left">
-    <div class="hero-eyebrow fade-up">Education Leadership, International Development &amp; Impact Strategist · Leadership &amp; Development Expert · Lagos | Abuja, Nigeria</div>
+    <div class="hero-eyebrow fade-up" data-sb-key="hero_eyebrow">Education Leadership, International Development &amp; Impact Strategist · Leadership &amp; Development Expert · Lagos | Abuja, Nigeria</div>
     <h1 class="hero-name fade-up delay-1">
       Bamidele
       <em>Itunuoluwa</em>
@@ -807,11 +807,11 @@
       6× Global Fellow · Education Consultant · UN Global Schools Advocate · Founder, Giddy2School Nigeria<br>
       NESG OOSC Thematic Member · Leadership &amp; Development Expert · Presidential Awardee · Published Researcher
     </p>
-    <blockquote class="hero-tagline fade-up delay-3">
+    <blockquote class="hero-tagline fade-up delay-3" data-sb-key="hero_tagline">
       "I help young Africans get into global opportunities — and the organisations serving them build the systems to actually scale."
     </blockquote>
     <div class="hero-actions fade-up delay-4">
-      <a href="https://calendly.com/itunuoluwa-giddy2school/consult-itunuoluwa-one-on-one-discovery-call" target="_blank" class="btn-primary">Book a Free Discovery Call</a>
+      <a href="https://calendly.com/itunuoluwa-giddy2school/consult-itunuoluwa-one-on-one-discovery-call" target="_blank" class="btn-primary" data-sb-key="hero_cta_url" data-sb-text="hero_cta_text">Book a Free Discovery Call</a>
       <a href="https://paystack.shop/consult-itunuoluwa" target="_blank" class="btn-outline">See Services &amp; Pricing</a>
     </div>
   </div>
@@ -826,20 +826,20 @@
   </div>
     <div class="hero-stats">
       <div class="stat-box">
-        <span class="stat-num">20K+</span>
-        <span class="stat-label">Young people impacted</span>
+        <span class="stat-num" data-sb-key="stat1_num">20K+</span>
+        <span class="stat-label" data-sb-key="stat1_label">Young people impacted</span>
       </div>
       <div class="stat-box">
-        <span class="stat-num">634+</span>
-        <span class="stat-label">Fellows trained across Africa</span>
+        <span class="stat-num" data-sb-key="stat2_num">634+</span>
+        <span class="stat-label" data-sb-key="stat2_label">Fellows trained across Africa</span>
       </div>
       <div class="stat-box">
-        <span class="stat-num">95%</span>
-        <span class="stat-label">School dropout rate remedied</span>
+        <span class="stat-num" data-sb-key="stat3_num">95%</span>
+        <span class="stat-label" data-sb-key="stat3_label">School dropout rate remedied</span>
       </div>
       <div class="stat-box">
-        <span class="stat-num">₦20M+</span>
-        <span class="stat-label">Funds mobilised for education</span>
+        <span class="stat-num" data-sb-key="stat4_num">₦20M+</span>
+        <span class="stat-label" data-sb-key="stat4_label">Funds mobilised for education</span>
       </div>
     </div>
     <div class="hero-badges">
@@ -872,7 +872,7 @@
 <!-- ABOUT -->
 <section id="about">
   <div class="section-label">Who I Am</div>
-  <h2 class="section-heading">Not outside advice.<br>Lived experience.</h2>
+  <h2 class="section-heading" data-sb-key="about_heading">Not outside advice.<br>Lived experience.</h2>
   <div class="about-grid">
     <div class="about-left">
       <div class="about-photo-frame">
@@ -1047,7 +1047,7 @@
     <h2 class="section-heading">You already have what it takes.<br>Let's make sure the right people see it.</h2>
     <p class="section-sub">Every package is built around one thing: getting you the outcome you have been working toward. Not advice. Not a report. A result you can point to — and build on.</p>
   </div>
-  <div class="services-grid">
+  <div class="services-grid" id="services-grid">
 
     <div class="service-card">
       <div class="service-num">01 · For Individuals</div>
@@ -1284,7 +1284,7 @@
 <section id="testimonials">
   <div class="section-label" style="color:var(--gold-light);">Client Results</div>
   <h2 class="section-heading">This is what changes<br>when positioning is right.</h2>
-  <div class="testimonials-grid">
+  <div class="testimonials-grid" id="testimonials-grid">
     <div class="testimonial-card">
       <p class="testimonial-text">"It was just a message to him on LinkedIn for a guide through my fellowship program and Itunuoluwa took it up, extended the mentorship beyond what I asked for and ensured that the period of mentorship would be impactful and memorable. From storytelling skills, to revamping my CV, to positioning myself for global opportunities and so many amazing sessions — it was quite a beautiful journey. I am superduper grateful that I had a wonderful tour guide in the person of Itunuoluwa."</p>
       <div class="testimonial-author">
@@ -1499,13 +1499,200 @@
 </footer>
 
 <script>
-// ── SUPABASE CONNECTION ───────────────────────────────────────
-// Replace the two values below with your own from:
-// Supabase → Settings → API
+// ── SUPABASE CONNECTION ──────────────────────────────────────
 const SUPABASE_URL = 'https://jqznsvhopfutfrdkmuud.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE';
 const sbSite = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-// ─────────────────────────────────────────────────────────────
+
+// ── LIVE CONTENT LOADER ─────────────────────────────────────
+// Runs on every page load. Fetches latest content from Supabase
+// and hydrates the DOM — every admin save reflects immediately on the live site.
+async function loadContent() {
+  try {
+
+    // ── 1. SITE CONTENT ──────────────────────────────────────
+    // Table schema: id | section | title | subtitle | body | cta_text | cta_url
+    // Sections saved by admin: hero, hero_tagline, about, stats, speaking, booking
+    const { data: rows, error: e1 } = await sbSite
+      .from('site_content')
+      .select('*');
+
+    if (!e1 && rows && rows.length) {
+      // Build a lookup: section → row
+      const sc = {};
+      rows.forEach(r => { sc[r.section] = r; });
+
+      // ── HERO section ───────────────────────────────────────
+      const hero = sc['hero'];
+      if (hero) {
+        // Title (name) — the admin's Title field maps to hero name
+        if (hero.title) {
+          const nameEl = document.querySelector('.hero-name');
+          if (nameEl) {
+            // Preserve the italic Itunuoluwa formatting
+            const parts = hero.title.split(' ');
+            const last = parts.pop();
+            nameEl.innerHTML = parts.join(' ') + ' <em>' + last + '</em>';
+          }
+        }
+        // Subtitle / eyebrow
+        if (hero.subtitle) {
+          const eyeEl = document.querySelector('[data-sb-key="hero_eyebrow"]');
+          if (eyeEl) eyeEl.textContent = hero.subtitle;
+        }
+        // CTA button
+        if (hero.cta_text) {
+          const ctaEl = document.querySelector('[data-sb-key="hero_cta_url"]');
+          if (ctaEl) {
+            ctaEl.textContent = hero.cta_text;
+            if (hero.cta_url) ctaEl.href = hero.cta_url;
+          }
+        }
+      }
+
+      // ── HERO TAGLINE ───────────────────────────────────────
+      const htag = sc['hero_tagline'];
+      if (htag && htag.body) {
+        const tEl = document.querySelector('[data-sb-key="hero_tagline"]');
+        if (tEl) tEl.innerHTML = '"' + htag.body + '"';
+      }
+
+      // ── STATS ──────────────────────────────────────────────
+      // Admin saves stats as section = 'stats', body = JSON or newline-delimited
+      // Format stored: "20K+|Young people impacted\n634+|Fellows trained..." etc.
+      const statsRow = sc['stats'];
+      if (statsRow && statsRow.body) {
+        const lines = statsRow.body.split('\n').filter(Boolean);
+        const numEls = document.querySelectorAll('[data-sb-key^="stat"][data-sb-key$="_num"]');
+        const lblEls = document.querySelectorAll('[data-sb-key^="stat"][data-sb-key$="_label"]');
+        lines.forEach((line, i) => {
+          const [num, lbl] = line.split('|');
+          if (numEls[i] && num) numEls[i].textContent = num.trim();
+          if (lblEls[i] && lbl) lblEls[i].textContent = lbl.trim();
+        });
+      }
+
+      // ── ABOUT section heading ─────────────────────────────
+      const about = sc['about'];
+      if (about && about.title) {
+        const aEl = document.querySelector('[data-sb-key="about_heading"]');
+        if (aEl) aEl.innerHTML = about.title;
+      }
+
+      // ── SPEAKING section ──────────────────────────────────
+      const speaking = sc['speaking'];
+      if (speaking) {
+        const spkHead = document.querySelector('#speaking .section-heading');
+        if (spkHead && speaking.title) spkHead.innerHTML = speaking.title;
+        const spkSub = document.querySelector('#speaking .section-sub');
+        if (spkSub && speaking.subtitle) spkSub.textContent = speaking.subtitle;
+      }
+
+      // ── BOOKING section ───────────────────────────────────
+      const booking = sc['booking'];
+      if (booking) {
+        const bkHead = document.querySelector('#booking .section-heading');
+        if (bkHead && booking.title) bkHead.innerHTML = booking.title;
+        const bkSub = document.querySelector('.booking-sub');
+        if (bkSub && booking.body) bkSub.innerHTML = booking.body;
+        const bkCta = document.querySelector('.booking-cta-main');
+        if (bkCta) {
+          if (booking.cta_text) bkCta.textContent = booking.cta_text;
+          if (booking.cta_url)  bkCta.href = booking.cta_url;
+        }
+      }
+    }
+
+    // ── 2. SERVICES ──────────────────────────────────────────
+    const { data: svcs, error: e2 } = await sbSite
+      .from('services')
+      .select('*')
+      .eq('active', true)
+      .order('sort_order', { ascending: true });
+
+    if (!e2 && svcs && svcs.length) {
+      const grid = document.getElementById('services-grid');
+      if (grid) {
+        grid.innerHTML = svcs.map(s => {
+          const includes = Array.isArray(s.includes)
+            ? s.includes
+            : (s.includes ? String(s.includes).split('\n').filter(Boolean) : []);
+
+          const popular = s.popular
+            ? '<span class="service-popular">Most Popular</span>' : '';
+
+          const includeItems = includes
+            .map(i => `<li>${i}</li>`)
+            .join('');
+
+          const audience = s.audience
+            ? `<div class="service-num">${s.sort_order} · ${s.audience}</div>` : '';
+
+          const cta_url = s.cta_url || '#booking';
+          const price   = s.price   || '';
+          const period  = s.price_period || '/ engagement';
+
+          return `
+            <div class="service-card">
+              ${audience}
+              <h3>${s.title || ''}${popular}</h3>
+              <p>${s.description || ''}</p>
+              ${includeItems ? `<ul class="service-includes">${includeItems}</ul>` : ''}
+              ${price ? `<div class="service-price">${price} <span>${period}</span></div>` : ''}
+              <a href="${cta_url}" class="service-cta">Book this →</a>
+            </div>`;
+        }).join('');
+
+        // Re-attach scroll reveal to new cards
+        grid.querySelectorAll('.service-card').forEach(el => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          observer.observe(el);
+        });
+      }
+    }
+
+    // ── 3. TESTIMONIALS ──────────────────────────────────────
+    const { data: tmnls, error: e3 } = await sbSite
+      .from('testimonials')
+      .select('*')
+      .eq('active', true)
+      .order('sort_order', { ascending: true });
+
+    if (!e3 && tmnls && tmnls.length) {
+      const tGrid = document.getElementById('testimonials-grid');
+      if (tGrid) {
+        // Keep only real testimonials (remove placeholders)
+        const real = tmnls.filter(t => t.quote && t.quote.trim().length > 5);
+        if (real.length) {
+          tGrid.innerHTML = real.map(t => {
+            const initials = (t.author_name || 'A')
+              .split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            return `
+              <div class="testimonial-card">
+                <p class="testimonial-text">"${t.quote}"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">${initials}</div>
+                  <div class="author-info">
+                    <p>${t.author_name || ''}</p>
+                    <span>${t.author_role || ''}</span>
+                  </div>
+                </div>
+              </div>`;
+          }).join('');
+        }
+      }
+    }
+
+  } catch (err) {
+    // Silent fail — static content remains visible if Supabase is unreachable
+    console.warn('Supabase content load failed (static content shown):', err.message);
+  }
+}
+
+// Run immediately when DOM is ready
+document.addEventListener('DOMContentLoaded', loadContent);
 
 function openMobile() { document.getElementById('mobileMenu').classList.add('open'); }
 function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }

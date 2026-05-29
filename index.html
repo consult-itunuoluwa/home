@@ -1755,5 +1755,232 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
   observer.observe(el);
 });
 </script>
+<script>
+  // ── SUPABASE CONFIG ──
+  const SUPABASE_URL = 'https://jqznsvhopfutfrdkmuud.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE';
+  
+  let supabaseClient = null;
+  if (typeof supabase !== 'undefined') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+
+  // ── SAFE TEXT UPDATE ──
+  function setText(selector, text) {
+    const el = document.querySelector(selector);
+    if (el && text) el.textContent = text;
+  }
+  function setHtml(selector, html) {
+    const el = document.querySelector(selector);
+    if (el && html) el.innerHTML = html;
+  }
+  function setAttr(selector, attr, value) {
+    const el = document.querySelector(selector);
+    if (el && value) el.setAttribute(attr, value);
+  }
+
+  // ── LOAD SITE CONTENT (hero, about, booking, contact) ──
+  async function loadSiteContent() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('site_content')
+        .select('*')
+        .eq('is_active', true)
+        .order('id');
+
+      if (error) { console.error('site_content error:', error); return; }
+      if (!data) return;
+
+      data.forEach(row => {
+        switch(row.section) {
+          case 'hero':
+            setText('.hero-name', row.title || '');
+            // subtitle goes to hero-title paragraph
+            setHtml('.hero-title', row.subtitle || '');
+            if (row.cta_text) {
+              const cta = document.querySelector('.btn-primary');
+              if (cta) cta.textContent = row.cta_text;
+            }
+            if (row.cta_url) {
+              const cta = document.querySelector('.btn-primary');
+              if (cta) cta.href = row.cta_url;
+            }
+            break;
+          case 'hero_tagline':
+            // title = main tagline line, subtitle = second line
+            if (row.title) {
+              const tagline = document.querySelector('.hero-tagline');
+              if (tagline) tagline.innerHTML = `"${row.title}${row.subtitle ? ' — ' + row.subtitle : ''}"`;
+            }
+            if (row.cta_text) {
+              const cta = document.querySelector('.btn-primary');
+              if (cta) cta.textContent = row.cta_text;
+            }
+            if (row.cta_url) {
+              const cta = document.querySelector('.btn-primary');
+              if (cta) cta.href = row.cta_url;
+            }
+            break;
+          case 'about':
+            setHtml('#about .section-heading', row.title || '');
+            setHtml('.about-story', row.body || '');
+            break;
+          case 'about_pullquote':
+            setHtml('.about-pullquote', row.body || '');
+            break;
+          case 'booking':
+            setHtml('#booking .section-heading', row.title || '');
+            setHtml('.booking-sub', row.subtitle || '');
+            setHtml('.booking-wrap p', row.body || '');
+            if (row.cta_text) {
+              const cta = document.querySelector('.booking-cta-main');
+              if (cta) cta.textContent = row.cta_text;
+            }
+            if (row.cta_url) {
+              const cta = document.querySelector('.booking-cta-main');
+              if (cta) cta.href = row.cta_url;
+            }
+            break;
+          case 'contact':
+            setHtml('.contact-grid > div:last-child p', row.body || '');
+            break;
+          case 'payments':
+            if (row.cta_url) {
+              const cta = document.querySelector('.btn-outline');
+              if (cta) cta.href = row.cta_url;
+            }
+            break;
+        }
+      });
+    } catch (e) { console.error('loadSiteContent error:', e); }
+  }
+
+  // ── LOAD PROOF STATS ──
+  async function loadProofStats() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('proof_stats')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) { console.error('proof_stats error:', error); return; }
+      if (!data) return;
+
+      const statBoxes = document.querySelectorAll('.hero-stats .stat-box');
+      data.slice(0, 4).forEach((row, i) => {
+        if (statBoxes[i]) {
+          const numEl = statBoxes[i].querySelector('.stat-num');
+          const labelEl = statBoxes[i].querySelector('.stat-label');
+          if (numEl) numEl.textContent = row.stat_number || '';
+          if (labelEl) labelEl.textContent = row.label || '';
+        }
+      });
+    } catch (e) { console.error('loadProofStats error:', e); }
+  }
+
+  // ── LOAD TESTIMONIALS ──
+  async function loadTestimonials() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('testimonials')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) { console.error('testimonials error:', error); return; }
+      if (!data) return;
+
+      const cards = document.querySelectorAll('.testimonials-grid .testimonial-card');
+      data.slice(0, cards.length).forEach((row, i) => {
+        if (cards[i]) {
+          const textEl = cards[i].querySelector('.testimonial-text');
+          const authorEl = cards[i].querySelector('.author-info p');
+          const roleEl = cards[i].querySelector('.author-info span');
+          const avatarEl = cards[i].querySelector('.author-avatar');
+          
+          if (textEl) textEl.textContent = row.quote || '';
+          if (authorEl) authorEl.textContent = row.is_anonymous ? 'Anonymous' : (row.author_name || '');
+          if (roleEl) roleEl.textContent = row.author_role ? `${row.author_role}, ${row.author_org || ''}` : (row.author_org || '');
+          if (avatarEl) avatarEl.textContent = row.initials || '';
+        }
+      });
+    } catch (e) { console.error('loadTestimonials error:', e); }
+  }
+
+  // ── LOAD SPEAKING TOPICS ──
+  async function loadSpeakingTopics() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('speaking_topics')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) { console.error('speaking_topics error:', error); return; }
+      if (!data) return;
+
+      const topics = document.querySelectorAll('.speaking-topics .topic-card');
+      data.slice(0, topics.length).forEach((row, i) => {
+        if (topics[i]) {
+          const headerEl = topics[i].querySelector('.topic-header h4');
+          const tagEl = topics[i].querySelector('.topic-tag');
+          const bodyEl = topics[i].querySelector('.topic-body');
+          
+          if (headerEl) headerEl.textContent = row.title || '';
+          if (tagEl) tagEl.textContent = row.format || '';
+          if (bodyEl) bodyEl.textContent = row.description || '';
+        }
+      });
+    } catch (e) { console.error('loadSpeakingTopics error:', e); }
+  }
+
+  // ── LOAD AWARDS ──
+  async function loadAwards() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('awards')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) { console.error('awards error:', error); return; }
+      if (!data) return;
+
+      const items = document.querySelectorAll('.awards-strip .award-item');
+      data.slice(0, items.length).forEach((row, i) => {
+        if (items[i]) {
+          const yearEl = items[i].querySelector('.award-year');
+          const textEl = items[i].querySelector('.award-text');
+          
+          if (yearEl) yearEl.textContent = row.award_year || '';
+          if (textEl) {
+            const strongEl = textEl.querySelector('strong');
+            if (strongEl) strongEl.textContent = row.title || '';
+            // Replace body text after the strong tag
+            const bodyText = row.body || '';
+            if (bodyText) {
+              textEl.innerHTML = `<strong>${row.title || ''}</strong>${bodyText ? ' ' + bodyText : ''}`;
+            }
+          }
+        }
+      });
+    } catch (e) { console.error('loadAwards error:', e); }
+  }
+
+  // ── INIT ALL ──
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSiteContent();
+    loadProofStats();
+    loadTestimonials();
+    loadSpeakingTopics();
+    loadAwards();
+  });
+</script>
 </body>
 </html>

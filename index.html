@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <title>Consult Itunuoluwa — Education Leadership, International Development & Impact Strategist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1497,45 +1498,33 @@
     <div class="footer-note">Built on the work of Giddy2School Education Initiative · The personal brand. The firm comes next.</div>
   </div>
 </footer>
+
 <script>
   // ── SUPABASE CONFIG ──
   const SUPABASE_URL = 'https://jqznsvhopfutfrdkmuud.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE';
-
+  
   let supabaseClient = null;
   try {
     if (typeof supabase !== 'undefined' && supabase.createClient) {
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       console.log('✅ Supabase client initialized');
     } else {
-      console.warn('⚠️ Supabase library not loaded');
+      console.error('❌ Supabase library not loaded');
     }
   } catch (e) {
     console.error('❌ Supabase init failed:', e);
   }
 
-  // ── HELPERS ──
-  function setText(selector, text, context) {
-    const root = context || document;
-    const el = root.querySelector(selector);
-    if (el && text !== null && text !== undefined) {
-      el.textContent = text;
-      return true;
-    }
-    return false;
+  function setText(selector, text) {
+    const el = document.querySelector(selector);
+    if (el && text != null) el.textContent = text;
+  }
+  function setHtml(selector, html) {
+    const el = document.querySelector(selector);
+    if (el && html != null) el.innerHTML = html;
   }
 
-  function setHtml(selector, html, context) {
-    const root = context || document;
-    const el = root.querySelector(selector);
-    if (el && html !== null && html !== undefined) {
-      el.innerHTML = html;
-      return true;
-    }
-    return false;
-  }
-
-  // ── 1. LOAD SITE CONTENT (hero, about, booking, contact) ──
   async function loadSiteContent() {
     if (!supabaseClient) return;
     try {
@@ -1545,10 +1534,8 @@
         .eq('is_active', true)
         .order('id');
 
-      if (error) { console.error('site_content error:', error); return; }
-      if (!data || !data.length) { console.warn('site_content: no data'); return; }
-
-      console.log('📄 site_content rows loaded:', data.length);
+      if (error) { console.error('site_content DB error:', error.message); return; }
+      if (!data || !data.length) { console.warn('site_content: no rows'); return; }
 
       data.forEach(row => {
         switch(row.section) {
@@ -1564,9 +1551,7 @@
                 }
               }
             }
-            if (row.subtitle) {
-              setHtml('.hero-title', row.subtitle);
-            }
+            if (row.subtitle) setHtml('.hero-title', row.subtitle);
             if (row.cta_text) {
               const cta = document.querySelector('.hero-actions .btn-primary');
               if (cta) cta.textContent = row.cta_text;
@@ -1582,9 +1567,7 @@
               const tagline = document.querySelector('.hero-tagline');
               if (tagline) {
                 let html = '"' + row.title;
-                if (row.subtitle) {
-                  html += ' — ' + row.subtitle;
-                }
+                if (row.subtitle) html += ' — ' + row.subtitle;
                 html += '"';
                 tagline.innerHTML = html;
               }
@@ -1600,9 +1583,7 @@
             break;
 
           case 'about':
-            if (row.title) {
-              setHtml('#about .section-heading', row.title);
-            }
+            if (row.title) setHtml('#about .section-heading', row.title);
             if (row.body) {
               const storyEl = document.querySelector('.about-story');
               if (storyEl) {
@@ -1613,18 +1594,12 @@
             break;
 
           case 'about_pullquote':
-            if (row.body) {
-              setHtml('.about-pullquote', row.body);
-            }
+            if (row.body) setHtml('.about-pullquote', row.body);
             break;
 
           case 'booking':
-            if (row.title) {
-              setHtml('#booking .section-heading', row.title);
-            }
-            if (row.subtitle) {
-              setHtml('.booking-sub', row.subtitle);
-            }
+            if (row.title) setHtml('#booking .section-heading', row.title);
+            if (row.subtitle) setHtml('.booking-sub', row.subtitle);
             if (row.body) {
               const wrap = document.querySelector('.booking-wrap');
               if (wrap) {
@@ -1646,7 +1621,8 @@
             if (row.body) {
               const contactGrid = document.querySelector('.contact-grid');
               if (contactGrid) {
-                const rightCol = contactGrid.querySelector(':scope > div:last-child');
+                const cols = contactGrid.querySelectorAll(':scope > div');
+                const rightCol = cols[cols.length - 1];
                 if (rightCol) {
                   const p = rightCol.querySelector('p');
                   if (p) p.textContent = row.body;
@@ -1670,7 +1646,6 @@
     } catch (e) { console.error('loadSiteContent error:', e); }
   }
 
-  // ── 2. LOAD HERO STATS ──
   async function loadHeroStats() {
     if (!supabaseClient) return;
     try {
@@ -1681,10 +1656,8 @@
         .order('sort_order')
         .limit(4);
 
-      if (error) { console.error('proof_stats (hero) error:', error); return; }
-      if (!data || !data.length) { console.warn('proof_stats: no data'); return; }
-
-      console.log('📊 proof_stats (hero) loaded:', data.length);
+      if (error) { console.error('proof_stats (hero) DB error:', error.message); return; }
+      if (!data || !data.length) { console.warn('proof_stats: no rows'); return; }
 
       const statBoxes = document.querySelectorAll('.hero-stats .stat-box');
       data.forEach((row, i) => {
@@ -1698,7 +1671,6 @@
     } catch (e) { console.error('loadHeroStats error:', e); }
   }
 
-  // ── 3. LOAD PROOF SECTION STATS ──
   async function loadProofStats() {
     if (!supabaseClient) return;
     try {
@@ -1708,10 +1680,8 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('proof_stats error:', error); return; }
+      if (error) { console.error('proof_stats DB error:', error.message); return; }
       if (!data || !data.length) return;
-
-      console.log('📊 proof_stats (all) loaded:', data.length);
 
       const proofCards = document.querySelectorAll('.proof-grid .proof-card');
       data.slice(0, proofCards.length).forEach((row, i) => {
@@ -1720,7 +1690,6 @@
           const h3El = proofCards[i].querySelector('h3');
           const pEl = proofCards[i].querySelector('p');
           const statEl = proofCards[i].querySelector('.proof-card-stat');
-
           if (tagEl) tagEl.textContent = row.tag || '';
           if (h3El) h3El.textContent = row.label || '';
           if (pEl) pEl.textContent = row.description || '';
@@ -1730,7 +1699,6 @@
     } catch (e) { console.error('loadProofStats error:', e); }
   }
 
-  // ── 4. LOAD TESTIMONIALS ──
   async function loadTestimonials() {
     if (!supabaseClient) return;
     try {
@@ -1740,10 +1708,8 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('testimonials error:', error); return; }
-      if (!data || !data.length) { console.warn('testimonials: no data'); return; }
-
-      console.log('💬 testimonials loaded:', data.length);
+      if (error) { console.error('testimonials DB error:', error.message); return; }
+      if (!data || !data.length) { console.warn('testimonials: no rows'); return; }
 
       const cards = document.querySelectorAll('.testimonials-grid .testimonial-card');
       data.slice(0, cards.length).forEach((row, i) => {
@@ -1752,7 +1718,6 @@
           const authorEl = cards[i].querySelector('.author-info p');
           const roleEl = cards[i].querySelector('.author-info span');
           const avatarEl = cards[i].querySelector('.author-avatar');
-
           if (textEl) textEl.textContent = row.quote || '';
           if (authorEl) authorEl.textContent = row.is_anonymous ? 'Anonymous' : (row.author_name || '');
           if (roleEl) {
@@ -1767,7 +1732,6 @@
     } catch (e) { console.error('loadTestimonials error:', e); }
   }
 
-  // ── 5. LOAD SPEAKING TOPICS ──
   async function loadSpeakingTopics() {
     if (!supabaseClient) return;
     try {
@@ -1777,10 +1741,8 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('speaking_topics error:', error); return; }
-      if (!data || !data.length) { console.warn('speaking_topics: no data'); return; }
-
-      console.log('🎤 speaking_topics loaded:', data.length);
+      if (error) { console.error('speaking_topics DB error:', error.message); return; }
+      if (!data || !data.length) { console.warn('speaking_topics: no rows'); return; }
 
       const topics = document.querySelectorAll('.speaking-topics .topic-card');
       data.slice(0, topics.length).forEach((row, i) => {
@@ -1788,7 +1750,6 @@
           const headerEl = topics[i].querySelector('.topic-header h4');
           const tagEl = topics[i].querySelector('.topic-tag');
           const bodyEl = topics[i].querySelector('.topic-body');
-
           if (headerEl) headerEl.textContent = row.title || '';
           if (tagEl) tagEl.textContent = row.format || '';
           if (bodyEl) bodyEl.textContent = row.description || '';
@@ -1797,7 +1758,6 @@
     } catch (e) { console.error('loadSpeakingTopics error:', e); }
   }
 
-  // ── 6. LOAD AWARDS ──
   async function loadAwards() {
     if (!supabaseClient) return;
     try {
@@ -1807,17 +1767,14 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('awards error:', error); return; }
-      if (!data || !data.length) { console.warn('awards: no data'); return; }
-
-      console.log('🏆 awards loaded:', data.length);
+      if (error) { console.error('awards DB error:', error.message); return; }
+      if (!data || !data.length) { console.warn('awards: no rows'); return; }
 
       const items = document.querySelectorAll('.awards-strip .award-item');
       data.slice(0, items.length).forEach((row, i) => {
         if (items[i]) {
           const yearEl = items[i].querySelector('.award-year');
           const textEl = items[i].querySelector('.award-text');
-
           if (yearEl) yearEl.textContent = row.award_year || '';
           if (textEl) {
             const title = row.title || '';
@@ -1829,7 +1786,6 @@
     } catch (e) { console.error('loadAwards error:', e); }
   }
 
-  // ── INIT ALL ──
   document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Loading dynamic content from Supabase...');
     loadSiteContent();
@@ -1840,5 +1796,6 @@
     loadAwards();
   });
 </script>
+
 </body>
 </html>

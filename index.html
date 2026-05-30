@@ -1497,289 +1497,45 @@
     <div class="footer-note">Built on the work of Giddy2School Education Initiative · The personal brand. The firm comes next.</div>
   </div>
 </footer>
-
-<script>
-// ── SUPABASE CONNECTION ──────────────────────────────────────
-const SUPABASE_URL = 'https://jqznsvhopfutfrdkmuud.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE';
-const sbSite = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ── LIVE CONTENT LOADER ─────────────────────────────────────
-// Runs on every page load. Fetches latest content from Supabase
-// and hydrates the DOM — every admin save reflects immediately on the live site.
-async function loadContent() {
-  try {
-
-    // ── 1. SITE CONTENT ──────────────────────────────────────
-    // Table schema: id | section | title | subtitle | body | cta_text | cta_url
-    // Sections saved by admin: hero, hero_tagline, about, stats, speaking, booking
-    const { data: rows, error: e1 } = await sbSite
-      .from('site_content')
-      .select('*');
-
-    if (!e1 && rows && rows.length) {
-      // Build a lookup: section → row
-      const sc = {};
-      rows.forEach(r => { sc[r.section] = r; });
-
-      // ── HERO section ───────────────────────────────────────
-      const hero = sc['hero'];
-      if (hero) {
-        // Title (name) — the admin's Title field maps to hero name
-        if (hero.title) {
-          const nameEl = document.querySelector('.hero-name');
-          if (nameEl) {
-            // Preserve the italic Itunuoluwa formatting
-            const parts = hero.title.split(' ');
-            const last = parts.pop();
-            nameEl.innerHTML = parts.join(' ') + ' <em>' + last + '</em>';
-          }
-        }
-        // Subtitle / eyebrow
-        if (hero.subtitle) {
-          const eyeEl = document.querySelector('[data-sb-key="hero_eyebrow"]');
-          if (eyeEl) eyeEl.textContent = hero.subtitle;
-        }
-        // CTA button
-        if (hero.cta_text) {
-          const ctaEl = document.querySelector('[data-sb-key="hero_cta_url"]');
-          if (ctaEl) {
-            ctaEl.textContent = hero.cta_text;
-            if (hero.cta_url) ctaEl.href = hero.cta_url;
-          }
-        }
-      }
-
-      // ── HERO TAGLINE ───────────────────────────────────────
-      const htag = sc['hero_tagline'];
-      if (htag && htag.body) {
-        const tEl = document.querySelector('[data-sb-key="hero_tagline"]');
-        if (tEl) tEl.innerHTML = '"' + htag.body + '"';
-      }
-
-      // ── STATS ──────────────────────────────────────────────
-      // Admin saves stats as section = 'stats', body = JSON or newline-delimited
-      // Format stored: "20K+|Young people impacted\n634+|Fellows trained..." etc.
-      const statsRow = sc['stats'];
-      if (statsRow && statsRow.body) {
-        const lines = statsRow.body.split('\n').filter(Boolean);
-        const numEls = document.querySelectorAll('[data-sb-key^="stat"][data-sb-key$="_num"]');
-        const lblEls = document.querySelectorAll('[data-sb-key^="stat"][data-sb-key$="_label"]');
-        lines.forEach((line, i) => {
-          const [num, lbl] = line.split('|');
-          if (numEls[i] && num) numEls[i].textContent = num.trim();
-          if (lblEls[i] && lbl) lblEls[i].textContent = lbl.trim();
-        });
-      }
-
-      // ── ABOUT section heading ─────────────────────────────
-      const about = sc['about'];
-      if (about && about.title) {
-        const aEl = document.querySelector('[data-sb-key="about_heading"]');
-        if (aEl) aEl.innerHTML = about.title;
-      }
-
-      // ── SPEAKING section ──────────────────────────────────
-      const speaking = sc['speaking'];
-      if (speaking) {
-        const spkHead = document.querySelector('#speaking .section-heading');
-        if (spkHead && speaking.title) spkHead.innerHTML = speaking.title;
-        const spkSub = document.querySelector('#speaking .section-sub');
-        if (spkSub && speaking.subtitle) spkSub.textContent = speaking.subtitle;
-      }
-
-      // ── BOOKING section ───────────────────────────────────
-      const booking = sc['booking'];
-      if (booking) {
-        const bkHead = document.querySelector('#booking .section-heading');
-        if (bkHead && booking.title) bkHead.innerHTML = booking.title;
-        const bkSub = document.querySelector('.booking-sub');
-        if (bkSub && booking.body) bkSub.innerHTML = booking.body;
-        const bkCta = document.querySelector('.booking-cta-main');
-        if (bkCta) {
-          if (booking.cta_text) bkCta.textContent = booking.cta_text;
-          if (booking.cta_url)  bkCta.href = booking.cta_url;
-        }
-      }
-    }
-
-    // ── 2. SERVICES ──────────────────────────────────────────
-    const { data: svcs, error: e2 } = await sbSite
-      .from('services')
-      .select('*')
-      .eq('active', true)
-      .order('sort_order', { ascending: true });
-
-    if (!e2 && svcs && svcs.length) {
-      const grid = document.getElementById('services-grid');
-      if (grid) {
-        grid.innerHTML = svcs.map(s => {
-          const includes = Array.isArray(s.includes)
-            ? s.includes
-            : (s.includes ? String(s.includes).split('\n').filter(Boolean) : []);
-
-          const popular = s.popular
-            ? '<span class="service-popular">Most Popular</span>' : '';
-
-          const includeItems = includes
-            .map(i => `<li>${i}</li>`)
-            .join('');
-
-          const audience = s.audience
-            ? `<div class="service-num">${s.sort_order} · ${s.audience}</div>` : '';
-
-          const cta_url = s.cta_url || '#booking';
-          const price   = s.price   || '';
-          const period  = s.price_period || '/ engagement';
-
-          return `
-            <div class="service-card">
-              ${audience}
-              <h3>${s.title || ''}${popular}</h3>
-              <p>${s.description || ''}</p>
-              ${includeItems ? `<ul class="service-includes">${includeItems}</ul>` : ''}
-              ${price ? `<div class="service-price">${price} <span>${period}</span></div>` : ''}
-              <a href="${cta_url}" class="service-cta">Book this →</a>
-            </div>`;
-        }).join('');
-
-        // Re-attach scroll reveal to new cards
-        grid.querySelectorAll('.service-card').forEach(el => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(20px)';
-          el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-          observer.observe(el);
-        });
-      }
-    }
-
-    // ── 3. TESTIMONIALS ──────────────────────────────────────
-    const { data: tmnls, error: e3 } = await sbSite
-      .from('testimonials')
-      .select('*')
-      .eq('active', true)
-      .order('sort_order', { ascending: true });
-
-    if (!e3 && tmnls && tmnls.length) {
-      const tGrid = document.getElementById('testimonials-grid');
-      if (tGrid) {
-        // Keep only real testimonials (remove placeholders)
-        const real = tmnls.filter(t => t.quote && t.quote.trim().length > 5);
-        if (real.length) {
-          tGrid.innerHTML = real.map(t => {
-            const initials = (t.author_name || 'A')
-              .split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-            return `
-              <div class="testimonial-card">
-                <p class="testimonial-text">"${t.quote}"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">${initials}</div>
-                  <div class="author-info">
-                    <p>${t.author_name || ''}</p>
-                    <span>${t.author_role || ''}</span>
-                  </div>
-                </div>
-              </div>`;
-          }).join('');
-        }
-      }
-    }
-
-  } catch (err) {
-    // Silent fail — static content remains visible if Supabase is unreachable
-    console.warn('Supabase content load failed (static content shown):', err.message);
-  }
-}
-
-// Run immediately when DOM is ready
-document.addEventListener('DOMContentLoaded', loadContent);
-
-function openMobile() { document.getElementById('mobileMenu').classList.add('open'); }
-function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
-
-async function handleSubmit(e) {
-  e.preventDefault();
-  const form = e.target;
-  const btn  = form.querySelector('.form-submit');
-  const inputs   = form.querySelectorAll('input');
-  const selects  = form.querySelectorAll('select');
-  const textarea = form.querySelector('textarea');
-
-  btn.textContent = 'Sending…';
-  btn.disabled = true;
-
-  // Build the submission object matching the contact_submissions table
-  const submission = {
-    full_name:    inputs[0]?.value  || '',
-    email:        inputs[1]?.value  || '',
-    whatsapp:     inputs[2]?.value  || '',
-    client_type:  selects[0]?.value || '',
-    service_need: selects[1]?.value || '',
-    message:      textarea?.value   || '',
-  };
-
-  try {
-    const { error } = await sbSite.from('contact_submissions').insert([submission]);
-    if (error) throw error;
-    btn.textContent = 'Message sent ✓';
-    btn.style.background = '#0A7B5E';
-    setTimeout(() => {
-      btn.textContent = 'Send Message →';
-      btn.style.background = '';
-      btn.disabled = false;
-      form.reset();
-    }, 3000);
-  } catch (err) {
-    // Fallback: show friendly error, don't leave user stranded
-    btn.textContent = 'Send Message →';
-    btn.disabled = false;
-    alert('Message could not be sent right now. Please reach out directly on WhatsApp: +234 805 338 8755');
-    console.error('Supabase contact form error:', err);
-  }
-}
-
-// Scroll reveal
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
-    }
-  });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card, .testimonial-card, .process-step').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(20px)';
-  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-  observer.observe(el);
-});
-</script>
 <script>
   // ── SUPABASE CONFIG ──
   const SUPABASE_URL = 'https://jqznsvhopfutfrdkmuud.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxem5zdmhvcGZ1dGZyZGttdXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTM3MzQsImV4cCI6MjA5NDkyOTczNH0.-ysVrr-SoL_ZdvWjwxIyh_DjTS5fict3denfREW_wfE';
-  
+
   let supabaseClient = null;
-  if (typeof supabase !== 'undefined') {
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  try {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log('✅ Supabase client initialized');
+    } else {
+      console.warn('⚠️ Supabase library not loaded');
+    }
+  } catch (e) {
+    console.error('❌ Supabase init failed:', e);
   }
 
-  // ── SAFE TEXT UPDATE ──
-  function setText(selector, text) {
-    const el = document.querySelector(selector);
-    if (el && text) el.textContent = text;
-  }
-  function setHtml(selector, html) {
-    const el = document.querySelector(selector);
-    if (el && html) el.innerHTML = html;
-  }
-  function setAttr(selector, attr, value) {
-    const el = document.querySelector(selector);
-    if (el && value) el.setAttribute(attr, value);
+  // ── HELPERS ──
+  function setText(selector, text, context) {
+    const root = context || document;
+    const el = root.querySelector(selector);
+    if (el && text !== null && text !== undefined) {
+      el.textContent = text;
+      return true;
+    }
+    return false;
   }
 
-  // ── LOAD SITE CONTENT (hero, about, booking, contact) ──
+  function setHtml(selector, html, context) {
+    const root = context || document;
+    const el = root.querySelector(selector);
+    if (el && html !== null && html !== undefined) {
+      el.innerHTML = html;
+      return true;
+    }
+    return false;
+  }
+
+  // ── 1. LOAD SITE CONTENT (hero, about, booking, contact) ──
   async function loadSiteContent() {
     if (!supabaseClient) return;
     try {
@@ -1790,49 +1546,92 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
         .order('id');
 
       if (error) { console.error('site_content error:', error); return; }
-      if (!data) return;
+      if (!data || !data.length) { console.warn('site_content: no data'); return; }
+
+      console.log('📄 site_content rows loaded:', data.length);
 
       data.forEach(row => {
         switch(row.section) {
           case 'hero':
-            setText('.hero-name', row.title || '');
-            // subtitle goes to hero-title paragraph
-            setHtml('.hero-title', row.subtitle || '');
+            if (row.title) {
+              const nameEl = document.querySelector('.hero-name');
+              if (nameEl) {
+                const parts = row.title.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                  nameEl.innerHTML = parts[0] + ' <em>' + parts.slice(1).join(' ') + '</em>';
+                } else {
+                  nameEl.textContent = row.title;
+                }
+              }
+            }
+            if (row.subtitle) {
+              setHtml('.hero-title', row.subtitle);
+            }
             if (row.cta_text) {
-              const cta = document.querySelector('.btn-primary');
+              const cta = document.querySelector('.hero-actions .btn-primary');
               if (cta) cta.textContent = row.cta_text;
             }
             if (row.cta_url) {
-              const cta = document.querySelector('.btn-primary');
+              const cta = document.querySelector('.hero-actions .btn-primary');
               if (cta) cta.href = row.cta_url;
             }
             break;
+
           case 'hero_tagline':
-            // title = main tagline line, subtitle = second line
             if (row.title) {
               const tagline = document.querySelector('.hero-tagline');
-              if (tagline) tagline.innerHTML = `"${row.title}${row.subtitle ? ' — ' + row.subtitle : ''}"`;
+              if (tagline) {
+                let html = '"' + row.title;
+                if (row.subtitle) {
+                  html += ' — ' + row.subtitle;
+                }
+                html += '"';
+                tagline.innerHTML = html;
+              }
             }
             if (row.cta_text) {
-              const cta = document.querySelector('.btn-primary');
+              const cta = document.querySelector('.hero-actions .btn-primary');
               if (cta) cta.textContent = row.cta_text;
             }
             if (row.cta_url) {
-              const cta = document.querySelector('.btn-primary');
+              const cta = document.querySelector('.hero-actions .btn-primary');
               if (cta) cta.href = row.cta_url;
             }
             break;
+
           case 'about':
-            setHtml('#about .section-heading', row.title || '');
-            setHtml('.about-story', row.body || '');
+            if (row.title) {
+              setHtml('#about .section-heading', row.title);
+            }
+            if (row.body) {
+              const storyEl = document.querySelector('.about-story');
+              if (storyEl) {
+                const paragraphs = row.body.split('\n\n').map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+                storyEl.innerHTML = paragraphs;
+              }
+            }
             break;
+
           case 'about_pullquote':
-            setHtml('.about-pullquote', row.body || '');
+            if (row.body) {
+              setHtml('.about-pullquote', row.body);
+            }
             break;
+
           case 'booking':
-            setHtml('#booking .section-heading', row.title || '');
-            setHtml('.booking-sub', row.subtitle || '');
-            setHtml('.booking-wrap p', row.body || '');
+            if (row.title) {
+              setHtml('#booking .section-heading', row.title);
+            }
+            if (row.subtitle) {
+              setHtml('.booking-sub', row.subtitle);
+            }
+            if (row.body) {
+              const wrap = document.querySelector('.booking-wrap');
+              if (wrap) {
+                const p = wrap.querySelector('p');
+                if (p) p.textContent = row.body;
+              }
+            }
             if (row.cta_text) {
               const cta = document.querySelector('.booking-cta-main');
               if (cta) cta.textContent = row.cta_text;
@@ -1842,13 +1641,28 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
               if (cta) cta.href = row.cta_url;
             }
             break;
+
           case 'contact':
-            setHtml('.contact-grid > div:last-child p', row.body || '');
+            if (row.body) {
+              const contactGrid = document.querySelector('.contact-grid');
+              if (contactGrid) {
+                const rightCol = contactGrid.querySelector(':scope > div:last-child');
+                if (rightCol) {
+                  const p = rightCol.querySelector('p');
+                  if (p) p.textContent = row.body;
+                }
+              }
+            }
             break;
+
           case 'payments':
             if (row.cta_url) {
-              const cta = document.querySelector('.btn-outline');
+              const cta = document.querySelector('.hero-actions .btn-outline');
               if (cta) cta.href = row.cta_url;
+            }
+            if (row.cta_text) {
+              const cta = document.querySelector('.hero-actions .btn-outline');
+              if (cta) cta.textContent = row.cta_text;
             }
             break;
         }
@@ -1856,7 +1670,35 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
     } catch (e) { console.error('loadSiteContent error:', e); }
   }
 
-  // ── LOAD PROOF STATS ──
+  // ── 2. LOAD HERO STATS ──
+  async function loadHeroStats() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('proof_stats')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order')
+        .limit(4);
+
+      if (error) { console.error('proof_stats (hero) error:', error); return; }
+      if (!data || !data.length) { console.warn('proof_stats: no data'); return; }
+
+      console.log('📊 proof_stats (hero) loaded:', data.length);
+
+      const statBoxes = document.querySelectorAll('.hero-stats .stat-box');
+      data.forEach((row, i) => {
+        if (statBoxes[i]) {
+          const numEl = statBoxes[i].querySelector('.stat-num');
+          const labelEl = statBoxes[i].querySelector('.stat-label');
+          if (numEl) numEl.textContent = row.stat_number || '';
+          if (labelEl) labelEl.textContent = row.label || '';
+        }
+      });
+    } catch (e) { console.error('loadHeroStats error:', e); }
+  }
+
+  // ── 3. LOAD PROOF SECTION STATS ──
   async function loadProofStats() {
     if (!supabaseClient) return;
     try {
@@ -1867,21 +1709,28 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
         .order('sort_order');
 
       if (error) { console.error('proof_stats error:', error); return; }
-      if (!data) return;
+      if (!data || !data.length) return;
 
-      const statBoxes = document.querySelectorAll('.hero-stats .stat-box');
-      data.slice(0, 4).forEach((row, i) => {
-        if (statBoxes[i]) {
-          const numEl = statBoxes[i].querySelector('.stat-num');
-          const labelEl = statBoxes[i].querySelector('.stat-label');
-          if (numEl) numEl.textContent = row.stat_number || '';
-          if (labelEl) labelEl.textContent = row.label || '';
+      console.log('📊 proof_stats (all) loaded:', data.length);
+
+      const proofCards = document.querySelectorAll('.proof-grid .proof-card');
+      data.slice(0, proofCards.length).forEach((row, i) => {
+        if (proofCards[i]) {
+          const tagEl = proofCards[i].querySelector('.proof-card-tag');
+          const h3El = proofCards[i].querySelector('h3');
+          const pEl = proofCards[i].querySelector('p');
+          const statEl = proofCards[i].querySelector('.proof-card-stat');
+
+          if (tagEl) tagEl.textContent = row.tag || '';
+          if (h3El) h3El.textContent = row.label || '';
+          if (pEl) pEl.textContent = row.description || '';
+          if (statEl) statEl.textContent = row.stat_number || '';
         }
       });
     } catch (e) { console.error('loadProofStats error:', e); }
   }
 
-  // ── LOAD TESTIMONIALS ──
+  // ── 4. LOAD TESTIMONIALS ──
   async function loadTestimonials() {
     if (!supabaseClient) return;
     try {
@@ -1892,7 +1741,9 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
         .order('sort_order');
 
       if (error) { console.error('testimonials error:', error); return; }
-      if (!data) return;
+      if (!data || !data.length) { console.warn('testimonials: no data'); return; }
+
+      console.log('💬 testimonials loaded:', data.length);
 
       const cards = document.querySelectorAll('.testimonials-grid .testimonial-card');
       data.slice(0, cards.length).forEach((row, i) => {
@@ -1901,17 +1752,22 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
           const authorEl = cards[i].querySelector('.author-info p');
           const roleEl = cards[i].querySelector('.author-info span');
           const avatarEl = cards[i].querySelector('.author-avatar');
-          
+
           if (textEl) textEl.textContent = row.quote || '';
           if (authorEl) authorEl.textContent = row.is_anonymous ? 'Anonymous' : (row.author_name || '');
-          if (roleEl) roleEl.textContent = row.author_role ? `${row.author_role}, ${row.author_org || ''}` : (row.author_org || '');
+          if (roleEl) {
+            let roleText = '';
+            if (row.author_role) roleText += row.author_role;
+            if (row.author_org) roleText += (roleText ? ', ' : '') + row.author_org;
+            roleEl.textContent = roleText;
+          }
           if (avatarEl) avatarEl.textContent = row.initials || '';
         }
       });
     } catch (e) { console.error('loadTestimonials error:', e); }
   }
 
-  // ── LOAD SPEAKING TOPICS ──
+  // ── 5. LOAD SPEAKING TOPICS ──
   async function loadSpeakingTopics() {
     if (!supabaseClient) return;
     try {
@@ -1922,7 +1778,9 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
         .order('sort_order');
 
       if (error) { console.error('speaking_topics error:', error); return; }
-      if (!data) return;
+      if (!data || !data.length) { console.warn('speaking_topics: no data'); return; }
+
+      console.log('🎤 speaking_topics loaded:', data.length);
 
       const topics = document.querySelectorAll('.speaking-topics .topic-card');
       data.slice(0, topics.length).forEach((row, i) => {
@@ -1930,7 +1788,7 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
           const headerEl = topics[i].querySelector('.topic-header h4');
           const tagEl = topics[i].querySelector('.topic-tag');
           const bodyEl = topics[i].querySelector('.topic-body');
-          
+
           if (headerEl) headerEl.textContent = row.title || '';
           if (tagEl) tagEl.textContent = row.format || '';
           if (bodyEl) bodyEl.textContent = row.description || '';
@@ -1939,7 +1797,7 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
     } catch (e) { console.error('loadSpeakingTopics error:', e); }
   }
 
-  // ── LOAD AWARDS ──
+  // ── 6. LOAD AWARDS ──
   async function loadAwards() {
     if (!supabaseClient) return;
     try {
@@ -1950,23 +1808,21 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
         .order('sort_order');
 
       if (error) { console.error('awards error:', error); return; }
-      if (!data) return;
+      if (!data || !data.length) { console.warn('awards: no data'); return; }
+
+      console.log('🏆 awards loaded:', data.length);
 
       const items = document.querySelectorAll('.awards-strip .award-item');
       data.slice(0, items.length).forEach((row, i) => {
         if (items[i]) {
           const yearEl = items[i].querySelector('.award-year');
           const textEl = items[i].querySelector('.award-text');
-          
+
           if (yearEl) yearEl.textContent = row.award_year || '';
           if (textEl) {
-            const strongEl = textEl.querySelector('strong');
-            if (strongEl) strongEl.textContent = row.title || '';
-            // Replace body text after the strong tag
-            const bodyText = row.body || '';
-            if (bodyText) {
-              textEl.innerHTML = `<strong>${row.title || ''}</strong>${bodyText ? ' ' + bodyText : ''}`;
-            }
+            const title = row.title || '';
+            const body = row.body || '';
+            textEl.innerHTML = '<strong>' + title + '</strong>' + (body ? ' ' + body : '');
           }
         }
       });
@@ -1975,7 +1831,9 @@ document.querySelectorAll('.proof-card, .service-card, .award-item, .topic-card,
 
   // ── INIT ALL ──
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Loading dynamic content from Supabase...');
     loadSiteContent();
+    loadHeroStats();
     loadProofStats();
     loadTestimonials();
     loadSpeakingTopics();

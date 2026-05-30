@@ -1525,18 +1525,25 @@
     if (el && html != null) el.innerHTML = html;
   }
 
+  // ── 1. SITE CONTENT (NO is_active filter — table doesn't have that column) ──
   async function loadSiteContent() {
     if (!supabaseClient) return;
     try {
       const { data, error } = await supabaseClient
         .from('site_content')
         .select('*')
-        .eq('is_active', true)
         .order('id');
 
-      if (error) { console.error('site_content DB error:', error.message); return; }
-      if (!data || !data.length) { console.warn('site_content: no rows'); return; }
+      if (error) {
+        console.error('❌ site_content DB error:', error.message, error);
+        return;
+      }
+      if (!data || !data.length) {
+        console.warn('⚠️ site_content: no rows returned');
+        return;
+      }
 
+      console.log('📄 site_content loaded:', data.length, 'rows');
       data.forEach(row => {
         switch(row.section) {
           case 'hero':
@@ -1646,6 +1653,7 @@
     } catch (e) { console.error('loadSiteContent error:', e); }
   }
 
+  // ── 2. HERO STATS (has is_active) ──
   async function loadHeroStats() {
     if (!supabaseClient) return;
     try {
@@ -1656,9 +1664,10 @@
         .order('sort_order')
         .limit(4);
 
-      if (error) { console.error('proof_stats (hero) DB error:', error.message); return; }
+      if (error) { console.error('proof_stats (hero) error:', error.message); return; }
       if (!data || !data.length) { console.warn('proof_stats: no rows'); return; }
 
+      console.log('📊 hero stats loaded:', data.length);
       const statBoxes = document.querySelectorAll('.hero-stats .stat-box');
       data.forEach((row, i) => {
         if (statBoxes[i]) {
@@ -1671,6 +1680,7 @@
     } catch (e) { console.error('loadHeroStats error:', e); }
   }
 
+  // ── 3. PROOF SECTION STATS (has is_active) ──
   async function loadProofStats() {
     if (!supabaseClient) return;
     try {
@@ -1680,9 +1690,10 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('proof_stats DB error:', error.message); return; }
+      if (error) { console.error('proof_stats error:', error.message); return; }
       if (!data || !data.length) return;
 
+      console.log('📊 proof stats loaded:', data.length);
       const proofCards = document.querySelectorAll('.proof-grid .proof-card');
       data.slice(0, proofCards.length).forEach((row, i) => {
         if (proofCards[i]) {
@@ -1699,6 +1710,7 @@
     } catch (e) { console.error('loadProofStats error:', e); }
   }
 
+  // ── 4. TESTIMONIALS (has is_active) ──
   async function loadTestimonials() {
     if (!supabaseClient) return;
     try {
@@ -1708,9 +1720,10 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('testimonials DB error:', error.message); return; }
+      if (error) { console.error('testimonials error:', error.message); return; }
       if (!data || !data.length) { console.warn('testimonials: no rows'); return; }
 
+      console.log('💬 testimonials loaded:', data.length);
       const cards = document.querySelectorAll('.testimonials-grid .testimonial-card');
       data.slice(0, cards.length).forEach((row, i) => {
         if (cards[i]) {
@@ -1732,6 +1745,7 @@
     } catch (e) { console.error('loadTestimonials error:', e); }
   }
 
+  // ── 5. SPEAKING TOPICS (has is_active) ──
   async function loadSpeakingTopics() {
     if (!supabaseClient) return;
     try {
@@ -1741,9 +1755,10 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('speaking_topics DB error:', error.message); return; }
+      if (error) { console.error('speaking_topics error:', error.message); return; }
       if (!data || !data.length) { console.warn('speaking_topics: no rows'); return; }
 
+      console.log('🎤 speaking topics loaded:', data.length);
       const topics = document.querySelectorAll('.speaking-topics .topic-card');
       data.slice(0, topics.length).forEach((row, i) => {
         if (topics[i]) {
@@ -1758,6 +1773,7 @@
     } catch (e) { console.error('loadSpeakingTopics error:', e); }
   }
 
+  // ── 6. AWARDS (has is_active) ──
   async function loadAwards() {
     if (!supabaseClient) return;
     try {
@@ -1767,9 +1783,10 @@
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) { console.error('awards DB error:', error.message); return; }
+      if (error) { console.error('awards error:', error.message); return; }
       if (!data || !data.length) { console.warn('awards: no rows'); return; }
 
+      console.log('🏆 awards loaded:', data.length);
       const items = document.querySelectorAll('.awards-strip .award-item');
       data.slice(0, items.length).forEach((row, i) => {
         if (items[i]) {
@@ -1786,6 +1803,7 @@
     } catch (e) { console.error('loadAwards error:', e); }
   }
 
+  // ── INIT ──
   document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Loading dynamic content from Supabase...');
     loadSiteContent();
